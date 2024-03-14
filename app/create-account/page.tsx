@@ -1,26 +1,36 @@
 import Link from 'next/link';
 import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
+import FormInput from '../../components/form-input';
+import FormButton from '../../components/form-button';
 
 export default function CreateAccount() {
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
       <div className="flex flex-col gap-2 *:font-medium">
         <h1 className="text-2xl">안녕하세요!</h1>
-        <h2 className="text-xl">회원가입을 위해 빈칸을 채워주세요.</h2>
+        <h2 className="text-xl">회원가입을 위해 빈칸을 채워 주세요.</h2>
       </div>
       <form className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <input
-            className="bg-transparent rounded-md w-full h-10 focus:outline-none 
-            ring-1 focus:ring-2 ring-neutral-200 focus:ring-orange-500 border-none
-            placeholder:text-neutral-400 placeholder:pl-2"
-            type="text"
-            placeholder="사용자 이름"
-            required
-          />
-          <span className="text-red-500 font-medium">입력 오류</span>
-        </div>
-        <button className="primary-btn h-10">회원가입</button>
+        <FormInput type="text" placeholder="사용자 이름" required errors={[]} />
+        <FormInput
+          type="email"
+          placeholder="사용자 계정 (이메일)"
+          required
+          errors={[]}
+        />
+        <FormInput
+          type="password"
+          placeholder="비밀번호"
+          required
+          errors={[]}
+        />
+        <FormInput
+          type="password"
+          placeholder="비밀번호 확인"
+          required
+          errors={[]}
+        />
+        <FormButton loading={false} text="회원가입" />
       </form>
       <div className="w-full h-px bg-neutral-500" />
       <div>
