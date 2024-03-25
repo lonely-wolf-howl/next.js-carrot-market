@@ -21,14 +21,12 @@ export default function Login() {
           type="email"
           placeholder="사용자 계정 (이메일)"
           required
-          errors={[]}
         />
         <FormInput
           name="password"
           type="password"
           placeholder="비밀번호"
           required
-          errors={state?.errors ?? []}
         />
         <FormButton text="로그인" />
       </form>
