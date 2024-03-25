@@ -2,9 +2,9 @@
 
 import { z } from 'zod';
 
-const checkPassword = (password: string) => {
-  return !password.includes('password');
-};
+const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/
+);
 
 const checkPasswordConfirm = ({
   password,
@@ -22,12 +22,17 @@ const formSchema = z
         required_error: '빈칸을 채워 주세요.',
       })
       .min(3, '3자 이상으로 작성해 주세요.')
-      .max(20, '20자 이내로 작성해 주세요.'),
-    email: z.string().email(),
+      .max(20, '20자 이내로 작성해 주세요.')
+      .toLowerCase()
+      .trim(),
+    email: z.string().email().toLowerCase(),
     password: z
       .string()
       .min(8, '8자 이상으로 작성해 주세요.')
-      .refine(checkPassword, '비밀번호에 포함되면 안되는 단어가 존재합니다.'),
+      .regex(
+        passwordRegex,
+        '대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.'
+      ),
     confirmPassword: z.string().min(8, '8자 이상으로 작성해 주세요.'),
   })
   .refine(checkPasswordConfirm, {
@@ -46,5 +51,7 @@ export async function createAccount(prevState: any, formData: FormData) {
   const result = formSchema.safeParse(data);
   if (!result.success) {
     return result.error.flatten();
+  } else {
+    console.log(result.data);
   }
 }
