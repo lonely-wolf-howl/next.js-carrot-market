@@ -1,32 +1,47 @@
 'use server';
 
 import { z } from 'zod';
-import {
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_REGEX,
-  PASSWORD_REGEX_ERROR,
-} from '@/lib/constants';
+import validator from 'validator';
+import { redirect } from 'next/navigation';
 
-const formSchema = z.object({
-  email: z.string().email().toLowerCase(),
-  password: z
-    .string({
-      required_error: '비밀번호를 입력해 주세요.',
-    })
-    .min(PASSWORD_MIN_LENGTH)
-    .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
-});
+const phoneNumberSchema = z
+  .string()
+  .trim()
+  .refine(
+    (phoneNumber) => validator.isMobilePhone(phoneNumber, 'ko-KR'),
+    '전화번호 형식이 잘못되었습니다.'
+  );
+const verifyNumberSchema = z.coerce.number().min(100000).max(999999);
 
-export async function smsVerification(prevState: any, formData: FormData) {
-  const data = {
-    email: formData.get('email'),
-    password: formData.get('password'),
-  };
+interface ActionState {
+  verifyNumber: boolean;
+}
 
-  const result = formSchema.safeParse(data);
-  if (!result.success) {
-    return result.error.flatten();
+export async function smsLogin(prevState: ActionState, formData: FormData) {
+  const phoneNumber = formData.get('phoneNumber');
+  const verifyNumber = formData.get('verifyNumber');
+
+  if (!prevState.verifyNumber) {
+    const result = phoneNumberSchema.safeParse(phoneNumber);
+    if (!result.success) {
+      return {
+        verifyNumber: false,
+        error: result.error.flatten(),
+      };
+    } else {
+      return {
+        verifyNumber: true,
+      };
+    }
   } else {
-    console.log(result.data);
+    const result = verifyNumberSchema.safeParse(verifyNumber);
+    if (!result.success) {
+      return {
+        verifyNumber: true,
+        error: result.error.flatten(),
+      };
+    } else {
+      redirect('/');
+    }
   }
 }

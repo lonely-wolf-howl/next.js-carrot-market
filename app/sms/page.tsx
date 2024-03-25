@@ -3,10 +3,15 @@
 import Input from '@/components/input';
 import Button from '@/components/button';
 import { useFormState } from 'react-dom';
-import { smsVerification } from './actions.ts';
+import { smsLogin } from './actions.ts';
+
+const initialState = {
+  verifyNumber: false,
+  error: undefined,
+};
 
 export default function SMSLogin() {
-  const [state, dispatch] = useFormState(smsVerification, null);
+  const [state, dispatch] = useFormState(smsLogin, initialState);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -14,19 +19,27 @@ export default function SMSLogin() {
         <h2 className="text-xl">아래 빈칸을 채워 주세요.</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-3">
-        <Input
-          name="phoneNumber"
-          type="number"
-          placeholder="전화번호"
-          required
+        {state.verifyNumber ? (
+          <Input
+            name="verifyNumber"
+            type="number"
+            placeholder="인증번호"
+            required
+            errors={state.error?.formErrors}
+            min={100000}
+            max={999999}
+          />
+        ) : (
+          <Input
+            name="phoneNumber"
+            type="text"
+            placeholder="전화번호"
+            required
+          />
+        )}
+        <Button
+          text={state.verifyNumber ? 'SMS 로그인' : 'SMS 인증번호 발송'}
         />
-        <Input
-          name="verifyNumber"
-          type="number"
-          placeholder="인증번호"
-          required
-        />
-        <Button text="SMS 인증" />
       </form>
     </div>
   );
