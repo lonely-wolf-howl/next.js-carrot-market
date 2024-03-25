@@ -1,10 +1,11 @@
 'use server';
 
 import { z } from 'zod';
-
-const passwordRegex = new RegExp(
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/
-);
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+} from '@/lib/constants';
 
 const checkPasswordConfirm = ({
   password,
@@ -21,19 +22,16 @@ const formSchema = z
         invalid_type_error: '문자열만 입력이 가능합니다.',
         required_error: '빈칸을 채워 주세요.',
       })
-      .min(3, '3자 이상으로 작성해 주세요.')
-      .max(20, '20자 이내로 작성해 주세요.')
       .toLowerCase()
       .trim(),
     email: z.string().email().toLowerCase(),
     password: z
       .string()
-      .min(8, '8자 이상으로 작성해 주세요.')
-      .regex(
-        passwordRegex,
-        '대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.'
-      ),
-    confirmPassword: z.string().min(8, '8자 이상으로 작성해 주세요.'),
+      .min(PASSWORD_MIN_LENGTH, '8자 이상으로 작성해 주세요.')
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+    confirmPassword: z
+      .string()
+      .min(PASSWORD_MIN_LENGTH, '8자 이상으로 작성해 주세요.'),
   })
   .refine(checkPasswordConfirm, {
     message: '입력된 비밀번호가 일치하지 않습니다.',

@@ -1,13 +1,14 @@
 'use client';
 
-import FormInput from '@/components/form-input';
-import FormButton from '@/components/form-button';
+import Input from '@/components/input';
+import Button from '@/components/button';
 import SocialLogin from '@/components/social-login';
 import { useFormState } from 'react-dom';
-import { handleForm } from './actions.ts';
+import { login } from './actions.ts';
+import { PASSWORD_MIN_LENGTH } from '@/lib/constants';
 
 export default function Login() {
-  const [state, action] = useFormState(handleForm, null);
+  const [state, dispatch] = useFormState(login, null);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -15,20 +16,23 @@ export default function Login() {
         <h1 className="text-2xl">안녕하세요!</h1>
         <h2 className="text-xl">아래 빈칸을 채워 주세요.</h2>
       </div>
-      <form action={action} className="flex flex-col gap-3">
-        <FormInput
+      <form action={dispatch} className="flex flex-col gap-3">
+        <Input
           name="email"
           type="email"
           placeholder="사용자 계정 (이메일)"
           required
+          errors={state?.fieldErrors.email}
         />
-        <FormInput
+        <Input
           name="password"
           type="password"
           placeholder="비밀번호"
           required
+          errors={state?.fieldErrors.password}
+          minLength={PASSWORD_MIN_LENGTH}
         />
-        <FormButton text="로그인" />
+        <Button text="로그인" />
       </form>
       <SocialLogin />
     </div>
