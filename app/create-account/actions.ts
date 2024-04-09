@@ -8,6 +8,9 @@ import {
 } from '@/lib/constants';
 import db from '@/lib/db';
 import bcrypt from 'bcrypt';
+import { getIronSession } from 'iron-session';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const checkPasswordConfirm = ({
   password,
@@ -95,6 +98,15 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-    return user;
+
+    const cookie = await getIronSession(cookies(), {
+      cookieName: 'carrot-market',
+      password: process.env.COOKIE_PASSWORD!,
+    });
+    //@ts-ignore
+    cookie.id = user.id; // encrypt
+    await cookie.save();
+
+    redirect('/profile');
   }
 }
