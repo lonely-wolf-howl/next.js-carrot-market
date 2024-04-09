@@ -6,6 +6,7 @@ import {
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
 } from '@/lib/constants';
+import db from '@/lib/db';
 
 const checkPasswordConfirm = ({
   password,
@@ -15,6 +16,32 @@ const checkPasswordConfirm = ({
   confirmPassword: string;
 }) => password === confirmPassword;
 
+const checkUsernameIsUnique = async (username: string) => {
+  const isExist = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return !Boolean(isExist);
+};
+
+const checkEmailIsUnique = async (email: string) => {
+  const isExist = await db.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return !Boolean(isExist);
+};
+
 const formSchema = z
   .object({
     username: z
@@ -23,8 +50,13 @@ const formSchema = z
         required_error: '빈칸을 채워 주세요.',
       })
       .toLowerCase()
-      .trim(),
-    email: z.string().email().toLowerCase(),
+      .trim()
+      .refine(checkUsernameIsUnique, '이미 존재하는 사용자 이름입니다.'),
+    email: z
+      .string()
+      .email()
+      .toLowerCase()
+      .refine(checkEmailIsUnique, '이미 존재하는 계정입니다.'),
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH, '8자 이상으로 작성해 주세요.')
@@ -46,7 +78,7 @@ export async function createAccount(prevState: any, formData: FormData) {
     confirmPassword: formData.get('confirmPassword'),
   };
 
-  const result = formSchema.safeParse(data);
+  const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
     return result.error.flatten();
   } else {

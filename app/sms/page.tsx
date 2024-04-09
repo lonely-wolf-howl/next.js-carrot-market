@@ -3,7 +3,7 @@
 import Input from '@/components/input';
 import Button from '@/components/button';
 import { useFormState } from 'react-dom';
-import { smsLogin } from './actions.ts';
+import { smsLogin } from './actions';
 
 const initialState = {
   verifyNumber: false,
