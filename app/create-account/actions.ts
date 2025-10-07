@@ -1,16 +1,16 @@
-'use server';
+"use server";
 
-import { z } from 'zod';
+import { z } from "zod";
 import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
-} from '@/lib/constants';
-import db from '@/lib/db';
-import bcrypt from 'bcrypt';
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+} from "@/lib/constants";
+import db from "@/lib/db";
+import bcrypt from "bcrypt";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const checkPasswordConfirm = ({
   password,
@@ -50,36 +50,36 @@ const formSchema = z
   .object({
     username: z
       .string({
-        invalid_type_error: '문자열만 입력이 가능합니다.',
-        required_error: '빈칸을 채워 주세요.',
+        invalid_type_error: "Only strings are allowed.",
+        required_error: "This field is required.",
       })
       .toLowerCase()
       .trim()
-      .refine(checkUsernameIsUnique, '이미 존재하는 사용자 이름입니다.'),
+      .refine(checkUsernameIsUnique, "This username is already taken."),
     email: z
       .string()
       .email()
       .toLowerCase()
-      .refine(checkEmailIsUnique, '이미 존재하는 계정입니다.'),
+      .refine(checkEmailIsUnique, "This email is already registered."),
     password: z
       .string()
-      .min(PASSWORD_MIN_LENGTH, '8자 이상으로 작성해 주세요.')
+      .min(PASSWORD_MIN_LENGTH, "Password must be at least 8 characters.")
       .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirmPassword: z
       .string()
-      .min(PASSWORD_MIN_LENGTH, '8자 이상으로 작성해 주세요.'),
+      .min(PASSWORD_MIN_LENGTH, "Password must be at least 8 characters."),
   })
   .refine(checkPasswordConfirm, {
-    message: '입력된 비밀번호가 일치하지 않습니다.',
-    path: ['confirmPassword'],
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
   });
 
 export async function createAccount(prevState: any, formData: FormData) {
   const data = {
-    username: formData.get('username'),
-    email: formData.get('email'),
-    password: formData.get('password'),
-    confirmPassword: formData.get('confirmPassword'),
+    username: formData.get("username"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   };
 
   const result = await formSchema.safeParseAsync(data);
@@ -100,13 +100,13 @@ export async function createAccount(prevState: any, formData: FormData) {
     });
 
     const cookie = await getIronSession(cookies(), {
-      cookieName: 'carrot-market',
+      cookieName: "carrot-market",
       password: process.env.COOKIE_PASSWORD!,
     });
     //@ts-ignore
     cookie.id = user.id; // encrypt
     await cookie.save();
 
-    redirect('/profile');
+    redirect("/profile");
   }
 }

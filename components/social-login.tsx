@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
 
 export default function SocialLogin() {
   return (
@@ -26,7 +26,7 @@ export default function SocialLogin() {
               />
             </svg>
           </span>
-          <span>SMS 로그인</span>
+          <span>Continue with SMS</span>
         </Link>
         <Link
           className="primary-btn flex h-10 items-center justify-center gap-3"
@@ -48,7 +48,7 @@ export default function SocialLogin() {
               />
             </svg>
           </span>
-          <span>깃허브 로그인</span>
+          <span>Continue with GitHub</span>
         </Link>
       </div>
     </>

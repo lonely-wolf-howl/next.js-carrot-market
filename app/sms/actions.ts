@@ -9,7 +9,7 @@ const phoneNumberSchema = z
   .trim()
   .refine(
     (phoneNumber) => validator.isMobilePhone(phoneNumber, 'ko-KR'),
-    '전화번호 형식이 잘못되었습니다.'
+    'Invalid phone number format.'
   );
 const verifyNumberSchema = z.coerce.number().min(100000).max(999999);
 
